@@ -59,7 +59,7 @@ def process_data_chunk(user_input_file,data_chunk, brand_settings, user_agents, 
             Logger.log(f"{product.input_sku} Query URL: {query_url} Variation: {variation}")
             
             
-            html_content = Azure_Replace.send_request(query_url, brand_rules)
+            html_content = new_thing.send_request(query_url, brand_rules)
             if html_content:
                 search_results = data_fetcher.parse_google_results(html_content)
             else:
@@ -85,7 +85,7 @@ def process_data_chunk(user_input_file,data_chunk, brand_settings, user_agents, 
 
                             Logger.log(f"{product.input_sku} Type: {url_type} URL: {url_str}")
 
-                            product_html = Azure_Replace.send_request(url_str, brand_rules)
+                            product_html = new_thing.send_request(url_str, brand_rules)
                             if product_html:
                                 product_schemas = data_fetcher.extract_product_schema(product_html)
                                 #Logger.log(f"{product.input_sku} Product Schemas: {product_schemas}")
