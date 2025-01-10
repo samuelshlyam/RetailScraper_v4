@@ -1,0 +1,62 @@
+{
+    "vitkac.com": {
+        "title": {
+            "tag": "span",
+            "id": "w_header",
+            "class": "None",
+            "attribute": "text"
+        },
+        "price": {
+            "tag": "p",
+            "id": "prod_price",
+            "class": "price",
+            "attribute": "text",
+            "child": {
+                "tag": "span",
+                "id": "regularPrice"
+            }
+        },
+        "product_id": {
+            "tag": "span",
+            "id": "productSymbol"
+        },
+        "brand": {
+            "tag": "",
+            "identifier": ""
+        },
+        "description": {
+            "tag": "p",
+            "class": "productDescription",
+            "attribute": "text"
+        },
+        "composition": {
+            "tag": "",
+            "identifier": ""
+        },
+"images": {
+    "tag": "a",
+    "multiple": "True",
+    "container": {
+        "tag": "article",
+        "id": "photoList"
+    },
+    "attribute": "href",
+    "comments": "COULD bE true not True "
+
+}
+
+
+    },
+     "gucci.com/us": "schema",
+     "alexandermcqueen.com/en-us": "schema",
+     "ysl.com/en-us": "schema",
+     "balenciaga.com/en-us": "schema",
+     "bottegaveneta.com/en-us": "schema",
+     "givenchy.com/us/": "schema",   
+     "us.burberry.com" : "schema",   
+     "moncler.com/en-us/" : "schema",
+     "dolcegabbana.com/en-us" : "schema",
+     "loewe.com/usa/en/" : "schema",
+     "versace.com/us/en/" : "schema",
+     "marcjacobs.com/default" : "schema"
+}
