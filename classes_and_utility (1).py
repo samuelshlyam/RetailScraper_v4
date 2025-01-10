@@ -51,15 +51,7 @@ class Product:
         return bool(self.prices and self.url)
 
 
-class BrandSettings:
-    def __init__(self, settings):
-        self.settings = settings
 
-    def get_rules_for_brand(self, brand_name):
-        for rule in self.settings['brand_rules']:
-            if str(brand_name).lower() in str(rule['names']).lower():
-                return rule
-        return None 
 import threading   
 
     
