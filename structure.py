@@ -612,7 +612,7 @@ def process_product_ids(product_ids_file, brand_name_file,error_log_file="error_
 #    settings = json.load(f)
     
     
-all_settings = load_settings_separately('settings.json', 'settings_multi_domain.json')
+all_settings = load_settings_separately('Search/settings.json', 'settings_multi_domain.json')
 settings = all_settings['settings']
 settings_multi_domain = all_settings['settings_multi_domain']
 

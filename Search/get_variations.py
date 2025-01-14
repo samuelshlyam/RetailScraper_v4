@@ -1,7 +1,10 @@
 import csv
 import json
+import os
 import re
 
+from bs4 import BeautifulSoup
+from selenium import webdriver
 
 class SKUManager:
     def __init__(self, brand_settings):
@@ -12,20 +15,22 @@ class SKUManager:
         input_variations=[input_sku]
         for brand_name in brand_names:
             input_variations.append(input_sku + " " + brand_name)
-        brand_variations = self.handle_brand_sku(input_sku, brand_rule)
-        blind_variations = self.handle_sku(input_sku, brand_rule)
+        brand_variations = self.create_brand_variations(input_sku, brand_rule)
+        blind_variations = self.create_blind_variations(input_sku, brand_rule)
         total_variations = input_variations + brand_variations + blind_variations
-        # modified_variations = []  # Create a new list for the modified variations
-        # for variation in total_variations:
-        #    modified_variations.append(f"site:farfetch.com {variation}")
-        ## Combine the original and modified variations
-        # total_variations += modified_variations
+
         print(f"Total Variations before length {len(total_variations)}")
         total_variations = list(dict.fromkeys(total_variations))
         print(f"Total Variations after length {len(total_variations)}")
+
         return total_variations
 
-    def handle_brand_sku(self, sku, brand_rule):
+    def generate_query(self, variation):
+        query = f"\"{variation}\""
+        query=f"https://www.google.com/search?q={query}"
+        return query
+
+    def create_brand_variations(self, sku, brand_rule):
         brand_names = brand_rule.get('names', [])
         cleaned_sku = clean_sku(sku)
         sku_format = brand_rule['sku_format']
@@ -59,7 +64,7 @@ class SKUManager:
         print(f"Brand List after length {len(brand_sku_list)}")
         return brand_sku_list
 
-    def handle_sku(self, sku, brand_rule):
+    def create_blind_variations(self, sku, brand_rule):
         delimiters=["."," ","-","_",""]
         brand_names=brand_rule.get('names',[])
         cleaned_sku = clean_sku(sku)
@@ -126,7 +131,6 @@ def remove_letters_from_end(s):
     # Return the string up to the last non-letter character
     return s[:non_letter_index + 1]
 
-@staticmethod
 def clean_sku(sku):
     sku = str(sku)
     print(f"Cleaning SKU: {sku}")
@@ -134,20 +138,58 @@ def clean_sku(sku):
     print(f"Cleaned SKU: {cleaned}")
     return cleaned
 
-@staticmethod
+
 def listify_file(file_path):
     with open(file_path, 'r') as file:
         reader = csv.reader(file)
         data = list(reader)
     return data
 
+
+def parse_google_results(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    results = []
+    for g in soup.find_all('div', class_='g'):
+        links = g.find_all('a')
+        if links and 'href' in links[0].attrs:  # check if 'href' attribute exists
+            results.append(links[0]['href'])
+    return results
+
+options = webdriver.ChromeOptions()
+options.add_argument("--auto-open-devtools-for-tabs")
+options.add_argument(
+    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+options.add_argument("--start-maximized")
+options.add_argument("--incognito")
+options.add_argument("--enable-javascript")
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-setuid-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument("--headless=new")
+options.add_argument("--disable-extensions")
+options.add_argument("--disable-gpu")
+
+#SKU, Brand, Location are passed in
 #Test Product Variations
-settings = json.loads(open('/Users/samuelshlyam/Retail_Scraper_v4/RetailScraper_v4/settings.json').read())
+current_directory=os.getcwd()
+settings_directory=os.path.join(current_directory,"brand_settings.json")
+settings = json.loads(open(settings_directory).read())
 brand_settings = BrandSettings(settings)
-test_settings=brand_settings.get_rules_for_brand("Loewe")
-print(test_settings)
-test_sku="818905QJAEK1000"
+test_settings=brand_settings.get_rules_for_brand("Givenchy")
+test_sku="BB50V9B1UC105"
 test_SKUManager=SKUManager(test_settings)
 variations=test_SKUManager.generate_variations(test_sku,test_settings)
+final_output=[]
+variations=variations[:25]
 for variation in variations:
-    print(variation)
+    query = test_SKUManager.generate_query(variation)
+    driver=webdriver.Chrome(options=options)
+    driver.get(query)
+    page_source = driver.execute_script("return document.documentElement.outerHTML;")
+    output_urls=parse_google_results(page_source)
+    single_output={"Variation":variation,"Unfiltered URLs":output_urls}
+    final_output.append(single_output)
+print(final_output)
+
+

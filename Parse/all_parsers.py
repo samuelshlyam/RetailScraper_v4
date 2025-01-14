@@ -1,3 +1,6 @@
+from bs4 import BeautifulSoup
+
+
 class ProductSchema:
     def __init__(self, product_schemas, source):
         self.product_schemas = product_schemas
